@@ -1,0 +1,176 @@
+{
+  "version": 1,
+  "incidents": [
+    {
+      "id": "INC-20260825-001",
+      "showcase_id": "S-01",
+      "artifact_id": "A-01",
+      "metric": "相对湿度",
+      "reading": 80,
+      "lower": 45,
+      "upper": 60,
+      "discovery": "自检告警",
+      "sensitivity": "高",
+      "risk": "高",
+      "deviation": 0,
+      "risk_explain": "",
+      "deadline": "2026-08-25T14:36:01.37209023Z",
+      "status": "已关闭",
+      "revision": 5,
+      "created_at": "2026-08-25T12:36:01.37209023Z",
+      "closed_at": "2026-08-25T12:37:05.824691327Z"
+    },
+    {
+      "id": "INC-20260825-001",
+      "showcase_id": "S-01",
+      "artifact_id": "A-01",
+      "metric": "相对湿度",
+      "reading": 80,
+      "lower": 45,
+      "upper": 60,
+      "discovery": "自检告警",
+      "sensitivity": "高",
+      "risk": "高",
+      "deviation": 0,
+      "risk_explain": "",
+      "deadline": "2026-08-25T14:37:05.821297584Z",
+      "status": "新建",
+      "revision": 1,
+      "created_at": "2026-08-25T12:37:05.821297584Z"
+    },
+    {
+      "id": "INC-20260825-002",
+      "showcase_id": "S",
+      "artifact_id": "A",
+      "metric": "温度",
+      "reading": 30,
+      "lower": 18,
+      "upper": 24,
+      "discovery": "x",
+      "sensitivity": "高",
+      "risk": "高",
+      "deviation": 6,
+      "risk_explain": "偏差 6.00，占允许区间 100.00%；敏感度高，高风险阈值",
+      "deadline": "2026-08-25T14:52:19.069544236Z",
+      "status": "新建",
+      "revision": 1,
+      "created_at": "2026-08-25T12:52:19.069544236Z",
+      "idempotency_key": "k1"
+    }
+  ],
+  "tasks": [
+    {
+      "id": "TASK-INC-20260825-001",
+      "incident_id": "INC-20260825-001",
+      "assignee": "技术员甲",
+      "received_at": "2026-08-25T12:37:05.822391271Z",
+      "revision": 0,
+      "measures": [
+        "隔离展柜",
+        "调整设备"
+      ],
+      "operator": "技术员甲",
+      "operation_note": "调整空调并隔离展柜",
+      "retest": 52,
+      "retest_passed": true,
+      "review_note": "证据完整，批准关闭",
+      "approval": "批准",
+      "attachments": null,
+      "updated_at": "2026-08-25T12:37:05.824414827Z"
+    }
+  ],
+  "timeline": [
+    {
+      "id": "INC-20260825-001-T1",
+      "incident_id": "INC-20260825-001",
+      "action": "登记",
+      "actor": "值班员",
+      "summary": "登记环境异常，风险等级 高",
+      "at": "2026-08-25T12:36:01.37209023Z"
+    },
+    {
+      "id": "INC-20260825-001-T1",
+      "incident_id": "INC-20260825-001",
+      "action": "登记",
+      "actor": "值班员",
+      "summary": "登记环境异常，风险等级 高",
+      "at": "2026-08-25T12:37:05.821297584Z"
+    },
+    {
+      "id": "INC-20260825-001-T2",
+      "incident_id": "INC-20260825-001",
+      "action": "已分派",
+      "actor": "值班员",
+      "summary": "已分派给技术员甲",
+      "at": "2026-08-25T12:37:05.822112161Z"
+    },
+    {
+      "id": "TASK-INC-20260825-001-T1",
+      "incident_id": "INC-20260825-001",
+      "action": "分派",
+      "actor": "值班员",
+      "summary": "负责人：技术员甲",
+      "at": "2026-08-25T12:37:05.822391271Z"
+    },
+    {
+      "id": "INC-20260825-001-T3",
+      "incident_id": "INC-20260825-001",
+      "action": "处置中",
+      "actor": "值班员",
+      "summary": "开始现场处置",
+      "at": "2026-08-25T12:37:05.82290543Z"
+    },
+    {
+      "id": "TASK-INC-20260825-001-A123705",
+      "incident_id": "INC-20260825-001",
+      "action": "现场处置",
+      "actor": "值班员",
+      "summary": "调整空调并隔离展柜",
+      "at": "2026-08-25T12:37:05.823149572Z"
+    },
+    {
+      "id": "TASK-INC-20260825-001-V123705",
+      "incident_id": "INC-20260825-001",
+      "action": "复测",
+      "actor": "值班员",
+      "summary": "复测读数 52.00，结论：合格",
+      "at": "2026-08-25T12:37:05.823687486Z"
+    },
+    {
+      "id": "INC-20260825-001-T4",
+      "incident_id": "INC-20260825-001",
+      "action": "待复核",
+      "actor": "值班员",
+      "summary": "复测合格，等待主管复核",
+      "at": "2026-08-25T12:37:05.823950097Z"
+    },
+    {
+      "id": "TASK-INC-20260825-001-R123705",
+      "incident_id": "INC-20260825-001",
+      "action": "主管批准",
+      "actor": "值班员",
+      "summary": "证据完整，批准关闭",
+      "at": "2026-08-25T12:37:05.824414827Z"
+    },
+    {
+      "id": "INC-20260825-001-T5",
+      "incident_id": "INC-20260825-001",
+      "action": "已关闭",
+      "actor": "值班员",
+      "summary": "证据完整，批准关闭",
+      "at": "2026-08-25T12:37:05.824693491Z"
+    },
+    {
+      "id": "INC-20260825-002-T1",
+      "incident_id": "INC-20260825-002",
+      "action": "登记",
+      "actor": "值班员",
+      "summary": "登记环境异常，风险等级 高",
+      "at": "2026-08-25T12:52:19.069544236Z",
+      "request_key": "k1"
+    }
+  ],
+  "idempotency": {
+    "k1": "INC-20260825-002"
+  }
+}

@@ -1,0 +1,5 @@
+<!doctype html>
+<html lang="zh-CN">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>文物展柜环境异常处置台</title><link rel="stylesheet" href="/static/style.css"></head>
+<body><header><h1>文物展柜环境异常处置台</h1><span>异常登记、处置、复核与归档</span></header><main><section class="panel"><h2>登记环境异常</h2><form id="incident-form"><input name="showcase" placeholder="展柜编号" required><input name="artifact" placeholder="文物编号" required><input name="metric" placeholder="指标" required><input name="reading" type="number" step="0.1" placeholder="当前读数" required><input name="lower" type="number" step="0.1" placeholder="允许下限" required><input name="upper" type="number" step="0.1" placeholder="允许上限" required><select name="sensitivity"><option>高</option><option selected>中</option><option>低</option></select><textarea name="discovery" placeholder="发现说明" required></textarea><button>登记异常</button></form></section><section><h2>异常列表</h2><div id="incidents"></div></section><section id="detail" class="panel hidden"></section></main><script src="/static/app.js"></script></body>
+</html>
