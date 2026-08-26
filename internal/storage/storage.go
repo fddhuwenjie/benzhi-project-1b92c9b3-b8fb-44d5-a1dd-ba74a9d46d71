@@ -350,7 +350,7 @@ func (s *Store) Task(id string) (Task, bool) {
 	defer s.mu.RUnlock()
 	for _, t := range s.data.Tasks {
 		if t.ID == id {
-			return t, true
+			return cloneTaskSnapshot(t), true
 		}
 	}
 	return Task{}, false
@@ -360,7 +360,7 @@ func (s *Store) TaskForIncident(id string) (Task, bool) {
 	defer s.mu.RUnlock()
 	for _, t := range s.data.Tasks {
 		if t.IncidentID == id {
-			return t, true
+			return cloneTaskSnapshot(t), true
 		}
 	}
 	return Task{}, false
