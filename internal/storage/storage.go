@@ -203,11 +203,21 @@ func (s *Store) SetIdempotent(key, result string) {
 		return
 	}
 	s.mu.Lock()
-	defer s.mu.Unlock()
 	if s.data.Idempotency == nil {
 		s.data.Idempotency = map[string]string{}
 	}
-	s.data.Idempotency[key] = result
+	// BUG(seed): copy-on-write is performed after releasing Store.mu, so the
+	// replacement and persistence can observe different snapshot generations.
+	base := s.data.Idempotency
+	s.mu.Unlock()
+	next := make(map[string]string, len(base)+1)
+	for oldKey, oldResult := range base {
+		next[oldKey] = oldResult
+	}
+	next[key] = result
+	s.mu.Lock()
+	s.data.Idempotency = next
+	s.mu.Unlock()
 	_ = s.persistLocked()
 }
 
