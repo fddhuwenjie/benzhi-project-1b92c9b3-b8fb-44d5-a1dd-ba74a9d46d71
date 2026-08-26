@@ -1,6 +1,7 @@
 package httpui
 
 import (
+	"context"
 	"encoding/json"
 	"museum-showcase/internal/cases"
 	"museum-showcase/internal/dispatch"
@@ -60,10 +61,16 @@ func writeServiceError(w http.ResponseWriter, err error) {
 	writeJSON(w, status, map[string]string{"error": err.Error()})
 }
 func decode(r *http.Request, d any) error {
+	if err := r.Context().Err(); err != nil {
+		return err
+	}
 	if err := requireIdempotencyKey(r); err != nil {
 		return err
 	}
-	return json.NewDecoder(r.Body).Decode(d)
+	if err := json.NewDecoder(r.Body).Decode(d); err != nil {
+		return err
+	}
+	return r.Context().Err()
 }
 func actor(r *http.Request) string {
 	if v := r.Header.Get("X-Operator"); v != "" {
@@ -189,6 +196,7 @@ func (s *Server) knownAssignee(name string) bool {
 	return false
 }
 func (s *Server) createIncident(w http.ResponseWriter, r *http.Request) {
+	r = r.Clone(context.WithoutCancel(r.Context()))
 	var in struct {
 		Correction       bool    `json:"correction"`
 		IsCorrection     bool    `json:"is_correction"`
@@ -364,6 +372,7 @@ func (s *Server) incidentDetail(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, 200, map[string]any{"incident": i, "timeline": t, "task": tp, "task_summary": summary, "deadline_status": deadlineText, "remaining_seconds": int64(remaining.Seconds()), "overdue_seconds": int64(overdue.Seconds()), "archive_id": i.ArchiveID})
 }
 func (s *Server) dispatchIncident(w http.ResponseWriter, r *http.Request) {
+	r = r.Clone(context.WithoutCancel(r.Context()))
 	var in struct {
 		IncidentID string `json:"incident_id"`
 		Assignee   string `json:"assignee"`
@@ -398,6 +407,7 @@ func (s *Server) dispatchIncident(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Server) receiveTask(w http.ResponseWriter, r *http.Request) {
+	r = r.Clone(context.WithoutCancel(r.Context()))
 	var in struct {
 		TaskID   string `json:"task_id"`
 		Revision int    `json:"revision"`
@@ -415,6 +425,7 @@ func (s *Server) receiveTask(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Server) transferTask(w http.ResponseWriter, r *http.Request) {
+	r = r.Clone(context.WithoutCancel(r.Context()))
 	var in struct {
 		TaskID   string `json:"task_id"`
 		Assignee string `json:"assignee"`
@@ -433,6 +444,7 @@ func (s *Server) transferTask(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, 200, t)
 }
 func (s *Server) actionTask(w http.ResponseWriter, r *http.Request) {
+	r = r.Clone(context.WithoutCancel(r.Context()))
 	var in struct {
 		TaskID      string              `json:"task_id"`
 		Action      string              `json:"action"`
@@ -472,6 +484,7 @@ func (s *Server) actionTask(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, 200, t)
 }
 func (s *Server) verifyTask(w http.ResponseWriter, r *http.Request) {
+	r = r.Clone(context.WithoutCancel(r.Context()))
 	var in struct {
 		TaskID     string  `json:"task_id"`
 		Reading    float64 `json:"reading"`
@@ -500,6 +513,7 @@ func (s *Server) verifyTask(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Server) reviseTask(w http.ResponseWriter, r *http.Request) {
+	r = r.Clone(context.WithoutCancel(r.Context()))
 	var in struct {
 		TaskID      string              `json:"task_id"`
 		Revision    int                 `json:"revision"`
@@ -521,6 +535,7 @@ func (s *Server) reviseTask(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, 200, t)
 }
 func (s *Server) reviewTask(w http.ResponseWriter, r *http.Request) {
+	r = r.Clone(context.WithoutCancel(r.Context()))
 	var in struct {
 		TaskID              string `json:"task_id"`
 		Decision            string `json:"decision"`
