@@ -162,9 +162,10 @@ type snapshot struct {
 }
 
 type Store struct {
-	mu   sync.RWMutex
-	dir  string
-	data snapshot
+	mu            sync.RWMutex
+	dir           string
+	data          snapshot
+	timelineCache map[string][]Timeline
 }
 
 func New(dir string) (*Store, error) {
@@ -366,15 +367,22 @@ func (s *Store) TaskForIncident(id string) (Task, bool) {
 	return Task{}, false
 }
 func (s *Store) Timelines(id string) []Timeline {
-	s.mu.RLock()
-	defer s.mu.RUnlock()
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	if cached, ok := s.timelineCache[id]; ok {
+		return append([]Timeline(nil), cached...)
+	}
 	var out []Timeline
 	for _, t := range s.data.Timeline {
 		if t.IncidentID == id {
 			out = append(out, t)
 		}
 	}
-	return out
+	if s.timelineCache == nil {
+		s.timelineCache = make(map[string][]Timeline)
+	}
+	s.timelineCache[id] = append([]Timeline(nil), out...)
+	return append([]Timeline(nil), out...)
 }
 
 func (s *Store) AllTimelines() []Timeline {
