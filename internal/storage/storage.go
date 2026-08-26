@@ -162,9 +162,10 @@ type snapshot struct {
 }
 
 type Store struct {
-	mu   sync.RWMutex
-	dir  string
-	data snapshot
+	mu        sync.RWMutex
+	dir       string
+	data      snapshot
+	eventFile *os.File
 }
 
 func New(dir string) (*Store, error) {
@@ -226,13 +227,17 @@ func (s *Store) persistLocked() error {
 	return nil
 }
 func (s *Store) appendEventLocked(t Timeline) error {
-	f, err := os.OpenFile(eventsPath(s.dir), os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0o644)
-	if err != nil {
-		return err
+	f := s.eventFile
+	if f == nil {
+		var err error
+		f, err = os.OpenFile(eventsPath(s.dir), os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0o644)
+		if err != nil {
+			return err
+		}
+		s.eventFile = f
 	}
-	defer f.Close()
 	b, _ := json.Marshal(t)
-	_, err = f.Write(append(b, '\n'))
+	_, err := f.Write(append(b, '\n'))
 	return err
 }
 func (s *Store) SaveIncident(i Incident, t Timeline) error {
