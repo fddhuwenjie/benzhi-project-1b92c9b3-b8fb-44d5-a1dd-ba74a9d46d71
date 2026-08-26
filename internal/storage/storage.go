@@ -240,10 +240,10 @@ func (s *Store) SaveIncident(i Incident, t Timeline) error {
 	defer s.mu.Unlock()
 	s.data.Incidents = append(s.data.Incidents, i)
 	s.data.Timeline = append(s.data.Timeline, t)
-	if err := s.appendEventLocked(t); err != nil {
+	if err := s.persistLocked(); err != nil {
 		return err
 	}
-	return s.persistLocked()
+	return s.appendEventLocked(t)
 }
 
 // SaveIncidents 原子保存一批异常及其时间线；校验全部完成后才会修改快照。
@@ -255,12 +255,15 @@ func (s *Store) SaveIncidents(incidents []Incident, timelines []Timeline) error 
 	defer s.mu.Unlock()
 	s.data.Incidents = append(s.data.Incidents, incidents...)
 	s.data.Timeline = append(s.data.Timeline, timelines...)
+	if err := s.persistLocked(); err != nil {
+		return err
+	}
 	for _, t := range timelines {
 		if err := s.appendEventLocked(t); err != nil {
 			return err
 		}
 	}
-	return s.persistLocked()
+	return nil
 }
 func (s *Store) UpdateIncident(i Incident, t Timeline) error {
 	s.mu.Lock()
@@ -277,20 +280,20 @@ func (s *Store) UpdateIncident(i Incident, t Timeline) error {
 		return ErrIncidentNotFound
 	}
 	s.data.Timeline = append(s.data.Timeline, t)
-	if err := s.appendEventLocked(t); err != nil {
+	if err := s.persistLocked(); err != nil {
 		return err
 	}
-	return s.persistLocked()
+	return s.appendEventLocked(t)
 }
 func (s *Store) SaveTask(task Task, t Timeline) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	s.data.Tasks = append(s.data.Tasks, task)
 	s.data.Timeline = append(s.data.Timeline, t)
-	if err := s.appendEventLocked(t); err != nil {
+	if err := s.persistLocked(); err != nil {
 		return err
 	}
-	return s.persistLocked()
+	return s.appendEventLocked(t)
 }
 func (s *Store) UpdateTask(task Task, t Timeline) error {
 	s.mu.Lock()
@@ -299,10 +302,10 @@ func (s *Store) UpdateTask(task Task, t Timeline) error {
 		if s.data.Tasks[n].ID == task.ID {
 			s.data.Tasks[n] = task
 			s.data.Timeline = append(s.data.Timeline, t)
-			if err := s.appendEventLocked(t); err != nil {
+			if err := s.persistLocked(); err != nil {
 				return err
 			}
-			return s.persistLocked()
+			return s.appendEventLocked(t)
 		}
 	}
 	return ErrTaskNotFound
