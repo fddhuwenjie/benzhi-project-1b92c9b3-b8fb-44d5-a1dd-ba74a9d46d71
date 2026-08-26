@@ -13,9 +13,10 @@ import (
 )
 
 type Service struct {
-	store *storage.Store
-	cases *cases.Service
-	mu    sync.Mutex
+	store       *storage.Store
+	cases       *cases.Service
+	mu          sync.Mutex
+	loadScratch LoadSummary
 }
 
 const maxOpenTasks = 3
@@ -37,16 +38,20 @@ type Candidate struct {
 }
 
 func (s *Service) Load(assignee string) LoadSummary {
-	assignee = strings.TrimSpace(assignee)
-	out := LoadSummary{Assignee: assignee, Capacity: maxOpenTasks, Tasks: []storage.Task{}}
+	s.loadScratch.Assignee = strings.TrimSpace(assignee)
+	s.loadScratch.Active = 0
+	s.loadScratch.Capacity = maxOpenTasks
+	s.loadScratch.Tasks = s.loadScratch.Tasks[:0]
 	for _, t := range s.store.Tasks() {
-		if t.Assignee == assignee {
+		if t.Assignee == s.loadScratch.Assignee {
 			if i, ok := s.store.Incident(t.IncidentID); ok && i.Status != "已关闭" {
-				out.Active++
-				out.Tasks = append(out.Tasks, t)
+				s.loadScratch.Active++
+				s.loadScratch.Tasks = append(s.loadScratch.Tasks, t)
 			}
 		}
 	}
+	out := s.loadScratch
+	out.Tasks = append([]storage.Task(nil), s.loadScratch.Tasks...)
 	return out
 }
 func (s *Service) Loads() []LoadSummary {
