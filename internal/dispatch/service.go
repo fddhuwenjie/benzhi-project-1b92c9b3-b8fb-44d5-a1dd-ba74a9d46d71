@@ -204,13 +204,13 @@ func (s *Service) AssignPending(incidentID, assignee, actor string, expected int
 	if load.Active >= load.Capacity {
 		return storage.Task{}, fmt.Errorf("负责人%s负载已满（%d/%d）", assignee, load.Active, load.Capacity)
 	}
-	if _, err := s.cases.Transition(incidentID, "已分派", actor, "已分派给"+assignee, expected); err != nil {
-		return storage.Task{}, err
-	}
 	now := time.Now().UTC()
 	task := storage.Task{ID: fmt.Sprintf("TASK-%s", incidentID), IncidentID: incidentID, Assignee: assignee, AssignedAt: &now, AssignedBy: actor, Revision: 1, Measures: []string{}, Attachments: []string{}, UpdatedAt: now, StrictWorkflow: true, MeasureCategories: map[string][]string{}}
 	t := storage.Timeline{ID: task.ID + "-T1", IncidentID: incidentID, Action: "分派", Actor: actor, Summary: fmt.Sprintf("负责人：%s，待接收；分派前负载 %d/%d，分派后 %d/%d", assignee, load.Active, load.Capacity, load.Active+1, load.Capacity), At: now, RequestKey: key}
 	if err := s.store.SaveTask(task, t); err != nil {
+		return storage.Task{}, err
+	}
+	if _, err := s.cases.Transition(incidentID, "已分派", actor, "已分派给"+assignee, expected); err != nil {
 		return storage.Task{}, err
 	}
 	if key != "" {
