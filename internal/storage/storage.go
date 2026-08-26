@@ -312,7 +312,7 @@ func (s *Store) Incident(id string) (Incident, bool) {
 	defer s.mu.RUnlock()
 	for _, i := range s.data.Incidents {
 		if i.ID == id {
-			return i, true
+			return cloneIncidentSnapshot(i), true
 		}
 	}
 	return Incident{}, false
@@ -330,7 +330,10 @@ func (s *Store) IncidentByArchive(id string) (Incident, bool) {
 func (s *Store) Incidents() []Incident {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
-	out := append([]Incident(nil), s.data.Incidents...)
+	out := make([]Incident, len(s.data.Incidents))
+	for n, i := range s.data.Incidents {
+		out[n] = cloneIncidentSnapshot(i)
+	}
 	return out
 }
 
@@ -340,7 +343,7 @@ func (s *Store) IncidentsByBatch(batchID string) []Incident {
 	var out []Incident
 	for _, i := range s.data.Incidents {
 		if i.BatchID == batchID {
-			out = append(out, i)
+			out = append(out, cloneIncidentSnapshot(i))
 		}
 	}
 	return out
