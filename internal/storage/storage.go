@@ -162,9 +162,11 @@ type snapshot struct {
 }
 
 type Store struct {
-	mu   sync.RWMutex
-	dir  string
-	data snapshot
+	mu               sync.RWMutex
+	dir              string
+	data             snapshot
+	archiveIndexOnce sync.Once
+	archiveIndex     map[string]string
 }
 
 func New(dir string) (*Store, error) {
@@ -320,8 +322,20 @@ func (s *Store) Incident(id string) (Incident, bool) {
 func (s *Store) IncidentByArchive(id string) (Incident, bool) {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
+	s.archiveIndexOnce.Do(func() {
+		s.archiveIndex = make(map[string]string)
+		for _, i := range s.data.Incidents {
+			if i.ArchiveID != "" {
+				s.archiveIndex[i.ArchiveID] = i.ID
+			}
+		}
+	})
+	incidentID, ok := s.archiveIndex[id]
+	if !ok {
+		return Incident{}, false
+	}
 	for _, i := range s.data.Incidents {
-		if i.ArchiveID == id {
+		if i.ID == incidentID {
 			return i, true
 		}
 	}
